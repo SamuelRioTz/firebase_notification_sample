@@ -1,4 +1,4 @@
-# Firebase Cloud Messaging intragrtion sample
+# Firebase Cloud Messaging intragration sample
 ## References
 Installation: [firebase cloud-messaging](https://firebase.google.com/docs/cloud-messaging/js/client) 
 ## Configuration
