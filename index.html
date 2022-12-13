@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-messaging-compat.js"></script>
+    <script src="./init.js"></script>
+
+</head>
+
+<body>
+    <div id="messageElement"></div>
+    <div id="tokenElement"></div>
+    <div id="notificationElement"></div>
+    <div id="notificationSavedElement"></div>
+    <div id="errorElement"></div>
+    <script>
+        const messageElement = document.getElementById('messageElement');
+        const tokenElement = document.getElementById('tokenElement');
+        const notificationElement = document.getElementById('notificationElement');
+        const notificationSavedElement = document.getElementById('notificationSavedElement');
+        const errorElement = document.getElementById('errorElement');
+
+
+
+        const messaging = firebase.messaging();
+        Notification.requestPermission()
+            .then(function () {
+                messageElement.innerHTML = 'Notification permission granted.';
+                console.log('Notification permission granted.');
+                // get the token in the form of promise
+                return messaging.getToken();
+            })
+            .then(function (token) {
+                tokenElement.innerHTML = 'Device token is : <br>' + token;
+            })
+            .catch(function (err) {
+                errorElement.innerHTML = errorElement.innerHTML + '; ' + err;
+                console.log('Unable to get permission to notify.', err);
+            });
+
+        let enableForegroundNotification = true;
+        messaging.onMessage(function (payload) {
+            console.log('Message received. ', payload);
+            notificationElement.innerHTML = notificationElement.innerHTML + JSON.stringify(payload);
+            localStorage.setItem("notificationSavedElement", JSON.stringify(payload));
+            if (enableForegroundNotification) {
+                let notification = payload.notification;
+                navigator.serviceWorker
+                    .getRegistrations()
+                    .then((registration) => {
+                        registration[0].showNotification(notification.title);
+                    });
+            }
+        });
+
+        notificationSavedElement.innerHTML = localStorage.getItem("notificationSavedElement")
+    </script>
+</body>
+
+</html>
